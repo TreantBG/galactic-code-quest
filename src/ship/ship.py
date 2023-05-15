@@ -226,7 +226,11 @@ class Ship:
                 system_info = {
                     'star_type': system.star_type,
                     'num_celestial_bodies': len(system.planets),
-                    'celestial_bodies': [planet.planet_type for planet in system.planets]
+                    'celestial_bodies': [
+                        {
+                            "planet_type": planet.planet_type,
+                        }
+                        for planet in system.planets]
                 }
             else:
                 # Full details available
