@@ -1,4 +1,3 @@
 venv/
 **/*.pyc
-.idea/vcs.xml
-.idea/misc.xml
+.idea/

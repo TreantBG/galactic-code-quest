@@ -26,6 +26,11 @@ def get_ship_info():
 def travel():
     data = request.get_json()
     destination = (int(data['x']), int(data['y']))
+    if destination[0] < 0 or destination[0] >= grid_size or destination[1] < 0 or destination[1] >= grid_size:
+        return jsonify({
+            'success': False,
+            'message': 'Travel failed, destination is outside galaxy bounds.'
+        })
     return jsonify(player.travel(destination))
 
 

@@ -36,8 +36,8 @@ class Galaxy:
 
     def get_cells_in_range(self, x, y, range_):
         cells = []
-        for i in range(x - range_, x + range_ + 1):
-            for j in range(y - range_, y + range_ + 1):
+        for i in range(x - range_, min(x + range_ + 1, self.width)):
+            for j in range(y - range_, min(y + range_ + 1, self.height)):
                 star_system = self.grid[i][j]
                 if star_system:
                     distance = math.dist((x, y), star_system.position)
@@ -61,6 +61,6 @@ if __name__ == '__main__':
     galaxy.generate()
     # print(galaxy.toJSON())
 
-    for cell in galaxy.get_cells_in_range(0, 0, 5):
+    for cell in galaxy.get_cells_in_range(11, 10, 5):
         if cell:
             print(cell.position, cell.star_type)

@@ -275,7 +275,7 @@ if __name__ == '__main__':
     player.cargo_hold.resources = [1000, 970, 1200, 1200, 200]
     # print(player.mine(planet))
     #
-    # print(player.travel((3, 3)))
+    print(player.travel((-1, 0)))
     # print(player.mine(planet))
     # print(planet.resources)
     print(player.upgrade('Warp Drive'))
