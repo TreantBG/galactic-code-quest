@@ -6,10 +6,12 @@ from src.galaxy.star_system import generate_star_system
 
 
 class Galaxy:
-    def __init__(self, width, height):
-        self.width = width
-        self.height = height
-        self.grid = [[None for _ in range(height)] for _ in range(width)]
+    def __init__(self, size, star_system_chance=0.15, aliens_chance=0.1):
+        self.width = size
+        self.height = size
+        self.grid = [[None for _ in range(self.height)] for _ in range(self.width)]
+        self.star_system_chance = star_system_chance
+        self.aliens_chance = aliens_chance
 
     def generate(self):
         star_systems = 0
@@ -18,7 +20,7 @@ class Galaxy:
 
         for i in range(self.width):
             for j in range(self.height):
-                if random.random() < 0.15:  # 20% chance for a star system to exist in a grid cell
+                if random.random() < self.star_system_chance:  # 20% chance for a star system to exist in a grid cell
                     star_system = generate_star_system()
                     star_system.set_position((i, j))
                     self.grid[i][j] = star_system
@@ -26,7 +28,7 @@ class Galaxy:
                     star_systems += 1
                     planets += len(star_system.planets)
 
-                    if random.random() < 0.05:
+                    if random.random() < self.aliens_chance:
                         star_system.populate_with_alians()
                         alians += 1
 

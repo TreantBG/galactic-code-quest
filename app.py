@@ -1,3 +1,5 @@
+import os
+
 from src.galaxy.galaxy import Galaxy
 from src.ship.ship import Ship
 
@@ -5,7 +7,11 @@ from flask import Flask, jsonify, request
 
 app = Flask(__name__)
 
-galaxy = Galaxy(10, 10)
+grid_size = int(os.environ.get('GRID_SIZE', 30))
+star_system_chance = float(os.environ.get('STAR_SYSTEM_CHANCE', 0.15))
+aliens_chance = float(os.environ.get('ALIENS_CHANCE', 0.1))
+
+galaxy = Galaxy(grid_size, star_system_chance, aliens_chance)
 galaxy.generate()
 
 player = Ship()
@@ -47,7 +53,7 @@ def mine():
 
     mine_result = {
         'success': False,
-        'message': 'Mining failed.'
+        'message': 'Mining failed, planet not found.'
     }
 
     for system in scanned_systems:
@@ -67,4 +73,4 @@ def upgrade():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()

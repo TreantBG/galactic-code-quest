@@ -48,3 +48,12 @@ Use the provided endpoints to control the ship:
   - **resource2**: Chose resource to mine or leave black for random. (Dark Matter, Scrap, Energy Crystals, Rare Earth Elements, Plasma)
 - **/upgrade**: Upgrade ship parts.
   - **part_name**: The part to upgrade. (Fuel Tank, Plasma Injector, Scanner, Warp Drive, Cargo Hold)
+
+[//]: # (# Environment Variables)
+
+[//]: # ()
+[//]: # (- **GRID_SIZE**: The size of the grid. &#40;Default: 30&#41;)
+
+[//]: # (- **STAR_SYSTEM_CHANCE**: The chance of a star system spawning. &#40;Default: 0.15&#41;)
+
+[//]: # (- **ALIENS_CHANCE**: The chance of aliens spawning. &#40;Default: 0.1&#41;)
