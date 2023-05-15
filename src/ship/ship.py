@@ -71,7 +71,10 @@ class Ship:
             return self.cargo_hold.upgrade(self.cargo_hold)
         else:
             print("Invalid part name.")
-            return False
+            return {
+                "success": False,
+                "message": "Invalid part name."
+            }
 
     def calculate_mining_cost(self, planet):
         base_mining_cost = 10
@@ -136,7 +139,10 @@ class Ship:
 
         if not resource1 and not resource2:
             print("No resources found on planet.")
-            return
+            return {
+                "success": True,
+                "message": "No resources found on planet."
+            }
 
         yield1 = random.randint(1, planet.resources[resource1])
         cargo_space_1 = self.cargo_hold.resources[index_of_resource(resource1)]
@@ -156,7 +162,7 @@ class Ship:
 
             resource1_cargo_hold_space = self.get_resource_space_left(resource1)
             if cargo_space_1 + yield1 > resource1_cargo_hold_space:
-                yield1 = resource1_cargo_hold_space
+                yield1 = min(planet.resources[resource1], resource1_cargo_hold_space)
 
             if yield1 > 0:
                 planet.resources[resource1] -= yield1
@@ -170,9 +176,10 @@ class Ship:
             if resource2:
                 resource2_cargo_hold_space = self.get_resource_space_left(resource2)
                 if cargo_space_2 + yield2 > resource2_cargo_hold_space:
-                    yield2 = resource2_cargo_hold_space
+                    yield2 = min(planet.resources[resource2], resource2_cargo_hold_space)
 
                 if yield2 > 0:
+                    planet.resources[resource2] -= yield2
                     self.cargo_hold.resources[index_of_resource(resource2)] += yield2
                     result["resource2"] = {
                         "name": resource2,
@@ -185,6 +192,10 @@ class Ship:
             return result
         else:
             print("Not enough fuel to mine.")
+            return {
+                "success": False,
+                "message": "Not enough fuel to mine."
+            }
 
     def get_cargo_hold_resources(self):
         return {
@@ -250,18 +261,23 @@ if __name__ == '__main__':
     # Example usage:
     player = Ship()
     planet = generate_planet("Terrestrial")
-    # print(player.travel((3, 3)))
-    # planet.set_position((3, 3))
+
+    planet.set_position((3, 3))
     # planet.resources = {
-    #     "Dark Matter": 1000,
+    #     "Scrap": 500,
     # }
     # print(planet.to_dict())
     # print("mining cost is", player.calculate_mining_cost(planet))
-    # print(player.mine(planet))
+
     # print(player.mine(planet))
     # Upgrade the Warp Drive:
 
-    player.cargo_hold.resources = [1000, 1200, 1200, 1200, 200]
+    player.cargo_hold.resources = [1000, 970, 1200, 1200, 200]
+    # print(player.mine(planet))
+    #
+    # print(player.travel((3, 3)))
+    # print(player.mine(planet))
+    # print(planet.resources)
     print(player.upgrade('Warp Drive'))
     print(player.upgrade('Warp Drive'))
     print(player.upgrade('Warp Drive'))
@@ -270,5 +286,5 @@ if __name__ == '__main__':
     #
     # print(player.get_ship_info())
     # print(player.travel((3, 3)))
-    print(player.get_cargo_hold_resources())
-    print(player.get_parts_info()['Warp Drive'])
+    # print(player.get_cargo_hold_resources())
+    # print(player.get_parts_info()['Warp Drive'])

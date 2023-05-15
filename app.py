@@ -68,8 +68,7 @@ def mine():
 def upgrade():
     data = request.get_json()
     part_name = data['part_name']
-    success = player.upgrade(part_name)
-    return jsonify({'success': success})
+    return jsonify(player.upgrade(part_name))
 
 
 if __name__ == '__main__':
