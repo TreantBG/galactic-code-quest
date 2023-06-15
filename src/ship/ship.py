@@ -254,6 +254,7 @@ class Ship:
             else:
                 # Full details available
                 system_info = {
+                    'can_be_mined': system.can_be_mined(),
                     'star_type': system.star_type,
                     'num_celestial_bodies': len(system.planets),
                     'celestial_bodies': [
