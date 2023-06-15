@@ -7,14 +7,19 @@ from src.ship.ship_part import FuelTank, PlasmaInjector, Scanner, WarpDrive, Car
 
 
 class Ship:
-    def __init__(self):
+    def __init__(self, start_x=0, start_y=0):
         self.fuel_tank = FuelTank()
         self.plasma_injector = PlasmaInjector()
         self.scanner = Scanner()
         self.warp_drive = WarpDrive()
         self.cargo_hold = CargoHold()
-        self.position = (0, 0)  # start at the origin
-        self.cargo_hold.resources = [100, 200, 200, 200, 200]  # start with 1000 units of each resource
+        self.position = (start_x, start_y)  # start at the origin
+        self.cargo_hold.resources = [100, 200, 200, 200, 200]  # start with each resource
+
+        self.total_planets_mined = 0
+        self.total_systems_scanned = set()
+        self.total_distance_travelled = 0
+        self.total_resources_mined = [0, 0, 0, 0, 0]
 
     def calculate_fuel_cost(self, destination):
         return math.dist(self.position, destination) * self.plasma_injector.value
@@ -41,6 +46,7 @@ class Ship:
         else:
             self.position = destination
             self.cargo_hold.resources[0] -= distance * self.plasma_injector.value
+            self.total_distance_travelled += distance
             return {
                 "success": True,
                 "message": "Travel successful.",
@@ -113,8 +119,8 @@ class Ship:
         return cargo_hold - resource_value
 
     def mine(self, planet, resource1=None, resource2=None):
-        if not planet.can_mine:
-            print("Planet is already mined out.")
+        if not planet.can_be_mined():
+            print("Planet or System is already mined out.")
             return {
                 "success": False,
                 "message": "Planet is already mined out."
@@ -152,7 +158,7 @@ class Ship:
             cargo_space_2 = self.cargo_hold.resources[index_of_resource(resource2)]
 
         if self.cargo_hold.resources[0] > mining_cost:
-            planet.can_mine = False
+            planet.mine()
             self.cargo_hold.resources[0] -= mining_cost
             result = {
                 "success": True,
@@ -167,6 +173,8 @@ class Ship:
             if yield1 > 0:
                 planet.resources[resource1] -= yield1
                 self.cargo_hold.resources[index_of_resource(resource1)] += yield1
+                self.total_resources_mined[index_of_resource(resource1)] += yield1
+
                 result["resource1"] = {
                     "name": resource1,
                     "yield": yield1,
@@ -181,12 +189,15 @@ class Ship:
                 if yield2 > 0:
                     planet.resources[resource2] -= yield2
                     self.cargo_hold.resources[index_of_resource(resource2)] += yield2
+                    self.total_resources_mined[index_of_resource(resource2)] += yield2
+
                     result["resource2"] = {
                         "name": resource2,
                         "yield": yield2,
                         "cargo_space": cargo_space_2 + yield2
                     }
 
+            self.total_planets_mined += 1
             print("Mining operation successful.")
             result["fuel"] = self.cargo_hold.resources[0]
             return result
@@ -211,6 +222,8 @@ class Ship:
 
         result = []
         for system in scanned_systems:
+            self.total_systems_scanned.add(system.position)
+
             distance = math.dist(self.position, system.position)
             if distance > max_range:
                 continue
@@ -263,19 +276,19 @@ class Ship:
 
 if __name__ == '__main__':
     # Example usage:
-    player = Ship()
+    player = Ship(3,3)
     planet = generate_planet("Terrestrial")
 
     planet.set_position((3, 3))
-    # planet.resources = {
-    #     "Scrap": 500,
-    # }
+    planet.resources = {
+        "Scrap": 500,
+    }
     # print(planet.to_dict())
     # print("mining cost is", player.calculate_mining_cost(planet))
 
-    # print(player.mine(planet))
+    print(player.mine(planet))
     # Upgrade the Warp Drive:
-
+    print(player.total_resources_mined)
     player.cargo_hold.resources = [1000, 970, 1200, 1200, 200]
     # print(player.mine(planet))
     #

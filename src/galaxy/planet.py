@@ -13,9 +13,24 @@ class Planet:
         self.position = (0, 0)
         self.id = str(uuid4())
         self.aliens = 0
+        self.star_system = None
+
+    def set_star_system(self, star_system):
+        self.star_system = star_system
 
     def set_position(self, position):
         self.position = position
+
+    def can_be_mined(self):
+        if self.star_system and not self.star_system.can_be_mined():
+            return False
+
+        return self.can_mine
+
+    def mine(self):
+        self.can_mine = False
+        if self.star_system:
+            self.star_system.mine()
 
     def to_dict(self):
         return self.__dict__

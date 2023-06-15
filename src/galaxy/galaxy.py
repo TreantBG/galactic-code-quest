@@ -20,7 +20,7 @@ class Galaxy:
 
         for i in range(self.width):
             for j in range(self.height):
-                if random.random() < self.star_system_chance:  # 20% chance for a star system to exist in a grid cell
+                if random.random() < self.star_system_chance:  # % chance for a star system to exist in a grid cell
                     star_system = generate_star_system()
                     star_system.set_position((i, j))
                     self.grid[i][j] = star_system
@@ -36,6 +36,10 @@ class Galaxy:
 
     def get_cells_in_range(self, x, y, range_):
         cells = []
+        x = int(x)
+        y = int(y)
+        range_ = int(range_)
+
         for i in range(x - range_, min(x + range_ + 1, self.width)):
             for j in range(y - range_, min(y + range_ + 1, self.height)):
                 star_system = self.grid[i][j]

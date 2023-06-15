@@ -1,3 +1,4 @@
+import math
 import os
 
 from src.galaxy.galaxy import Galaxy
@@ -7,14 +8,29 @@ from flask import Flask, jsonify, request
 
 app = Flask(__name__)
 
-grid_size = int(os.environ.get('GRID_SIZE', 30))
-star_system_chance = float(os.environ.get('STAR_SYSTEM_CHANCE', 0.15))
+grid_size = int(os.environ.get('GRID_SIZE', 50))
+star_system_chance = float(os.environ.get('STAR_SYSTEM_CHANCE', 0.075))  # 7.5%
 aliens_chance = float(os.environ.get('ALIENS_CHANCE', 0.1))
 
 galaxy = Galaxy(grid_size, star_system_chance, aliens_chance)
 galaxy.generate()
 
-player = Ship()
+player = Ship(grid_size / 2, grid_size / 2)
+
+
+@app.route('/statistics', methods=['GET'])
+def get_player_statistics():
+    return jsonify({
+        'ship': {
+            'distance_from_start': math.dist((grid_size / 2, grid_size / 2), player.position),
+            'position': player.position,
+            'total_planets_mined': player.total_planets_mined,
+            'total_resources_mined': player.total_resources_mined,
+
+            'total_systems_scanned': player.total_systems_scanned,
+            'total_distance_travelled': player.total_distance_travelled,
+        }
+    })
 
 
 @app.route('/info', methods=['GET'])

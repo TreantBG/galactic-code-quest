@@ -4,10 +4,21 @@ from src.galaxy.planet import generate_planet
 
 
 class StarSystem:
-    def __init__(self, star_type, planets):
+    def __init__(self, star_type):
         self.star_type = star_type
-        self.planets = planets
+        self.planets = []
         self.position = (0, 0)  # start at the origin
+        self.total_planet_mines = 2
+
+    def can_be_mined(self):
+        return self.total_planet_mines > 0
+
+    def mine(self):
+        self.total_planet_mines -= 1
+
+    def add_planet(self, planet):
+        self.planets.append(planet)
+        planet.set_star_system(self)
 
     def to_dict(self):
         return {
@@ -30,8 +41,9 @@ def generate_star_system():
     planet_counts = {'Red Dwarf': (2, 6), 'Yellow Dwarf': (4, 8), 'Blue Giant': (6, 10)}
     planet_types = ['Terrestrial', 'Gas Giant', 'Ice Giant', 'Asteroid Field', 'Moon', 'Dwarf Planet']
 
-    planets = []
-    for _ in range(random.randint(*planet_counts[star_type])):
-        planets.append(generate_planet(random.choice(planet_types)))
+    star_system = StarSystem(star_type)
 
-    return StarSystem(star_type, planets)
+    for _ in range(random.randint(*planet_counts[star_type])):
+        star_system.add_planet(generate_planet(random.choice(planet_types)))
+
+    return star_system

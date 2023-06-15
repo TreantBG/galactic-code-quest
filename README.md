@@ -13,7 +13,8 @@ Throughout your journey, you will encounter various resources that hold immense 
 - **Energy Crystals**: Powerful energy sources that enhance ship performance.
 - **Rare Earth Elements**: Precious elements with unique properties, essential for advanced technologies.
 - **Plasma**: A highly energized substance used in various scientific and engineering applications.
-  Each resource is vital for your success in the game. Collect them wisely and utilize them strategically to enhance
+  
+Each resource is vital for your success in the game. Collect them wisely and utilize them strategically to enhance
   your ship's capabilities and survive the challenges that lie ahead.
 
 # Ship Components
@@ -51,6 +52,15 @@ missions:
   speed, cargo capacity, and other key attributes to unlock new possibilities.
   Embark on this epic journey through space, utilizing these functions effectively to chart your own path, uncover
   hidden treasures, and become a legendary explorer of the cosmos.
+
+# Special Rules
+**Mine**
+  - Planet can be mined only once
+  - In a system can be mined only 2 planets
+  
+**Scan**
+- Scans are free
+- Scans can see limited information about the system depends on the scanner level
 
 # Travel Grid
 

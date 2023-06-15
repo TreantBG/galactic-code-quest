@@ -48,24 +48,24 @@ class ShipPart:
 
 class FuelTank(ShipPart):
     def __init__(self):
-        super().__init__(200, 20, [0, 500, 0, 0, 0], [0, 100, 0, 50, 0])
+        super().__init__(200, 20, [20, 500, 50, 50, 50], [0, 300, 50, 150, 35])
 
 
 class PlasmaInjector(ShipPart):
     def __init__(self):
-        super().__init__(5, -0.1, [0, 300, 50, 0, 0], [0, 100, 50, 0, 50])
+        super().__init__(5, -0.1, [20, 300, 50, 100, 200], [0, 200, 150, 50, 175])
 
 
 class Scanner(ShipPart):
     def __init__(self):
-        super().__init__(4, 1, [0, 400, 50, 0, 0], [0, 100, 50, 10, 0])
+        super().__init__(4, 1, [20, 400, 50, 50, 30], [0, 200, 100, 50, 30])
 
 
 class WarpDrive(ShipPart):
     def __init__(self):
-        super().__init__(6, 1, [0, 500, 100, 0, 0], [0, 150, 75, 40, 10])
+        super().__init__(6, 1, [20, 500, 100, 300, 50], [0, 150, 75, 200, 100])
 
 
 class CargoHold(ShipPart):
     def __init__(self):
-        super().__init__(1000, 200, [0, 700, 0, 0, 0], [0, 150, 0, 20, 0])
+        super().__init__(1000, 200, [20, 800, 0, 200, 0], [0, 300, 150, 150, 50])
