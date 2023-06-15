@@ -26,7 +26,7 @@ def get_player_statistics():
             'position': player.position,
             'total_planets_mined': player.total_planets_mined,
             'total_resources_mined': player.total_resources_mined,
-
+            'total_collected_alians': player.total_collected_alians,
             'total_systems_scanned': player.total_systems_scanned,
             'total_distance_travelled': player.total_distance_travelled,
         }

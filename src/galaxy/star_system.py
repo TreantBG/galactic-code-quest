@@ -22,6 +22,7 @@ class StarSystem:
 
     def to_dict(self):
         return {
+            'can_be_mined': self.can_be_mined(),
             'star_type': self.star_type,
             'planets': [planet.to_dict() for planet in self.planets]
         }

@@ -57,6 +57,8 @@ missions:
 **Mine**
   - Planet can be mined only once
   - In a system can be mined only 2 planets
+  - Two resources can be mined from one planet
+  - The quantity of the resource will be random value
   
 **Scan**
 - Scans are free
@@ -64,7 +66,7 @@ missions:
 
 # Travel Grid
 
-All positive Numbers are to the right and up.
+Only positive Numbers. The galaxy grid is in the fist quadrant only.
 
 |         |         |         |
 |---------|:-------:|--------:|
@@ -79,19 +81,124 @@ Enjoy your adventure in Galactic Code Quest and may the stars shine favorably up
 Use the provided endpoints to control the ship:
 
 - **/info**: Get ship information.
+  ```json
+  {
+   "parts":{
+      "Cargo Hold":{
+         "cost":[20,800,0,200,0],
+         "level":1,
+         "upgrade_cost":[0,300,150,150,50],
+         "value":1000
+      },
+      "Fuel Tank":{
+         "cost":[20,500,50,50,50],
+         "level":1,
+         "upgrade_cost":[0,300,50,150,35],
+         "value":200
+      },
+      "Plasma Injector":{
+         "cost":[20,300,50,100,200],
+         "level":1,
+         "upgrade_cost":[0,200,150,50,175],
+         "value":5
+      },
+      "Scanner":{
+         "cost":[20,400,50,50,30],
+         "level":1,
+         "upgrade_cost":[0,200,100,50,30],
+         "value":4
+      },
+      "Warp Drive":{
+         "cost":[20,500,100,300,50],
+         "level":1,
+         "upgrade_cost":[0,150,75,200,100],
+         "value":6
+      }
+   },
+   "position":[
+      494,
+      500
+   ],
+   "resources":{
+      "Dark Matter":70.0,
+      "Energy Crystals":200,
+      "Plasma":200,
+      "Rare Earth Elements":200,
+      "Scrap":200
+   }
+}
 - **/travel**: Initiate travel to a destination.
     - **X**: The destination X.
     - **Y**: The destination Y.
+  ```json
+  {
+   "fuel":65.0,
+   "fuel_cost":5.0,
+   "message":"Travel successful.",
+   "position":[
+      495,
+      500
+   ],
+   "success":true
+}
 - **/scan**: Perform a scan of nearby star systems.
+  - returns array of systems
+    ```json
+      [{
+       "can_be_mined": true,
+       "celestial_bodies":[
+        {
+           "atmosphere":"Nitrogen-Oxygen",
+           "gravity":0.8,
+           "id":"f4b92486-0bc4-4291-9064-14dc275c328c",
+           "mining_cost":10,
+           "planet_type":"Moon",
+           "resources":{
+              "Dark Matter":0,
+              "Scrap":846,
+              "Energy Crystals":100,
+              "Rare Earth Elements":818,
+              "Plasma":444
+           },
+           "temperature":88,
+           "can_be_mined": true,
+           "aliens": 0
+        }
+       ]
+    }]
+  
 - **/mine**: Mine resources from a specific planet.
     - **planet_id**: The planet id to mine.
     - **resource1**: Chose resource to mine or leave black for random. (Dark Matter, Scrap, Energy Crystals, Rare Earth
       Elements, Plasma)
     - **resource2**: Chose resource to mine or leave black for random. (Dark Matter, Scrap, Energy Crystals, Rare Earth
       Elements, Plasma)
+    ```json
+  {
+   "success":true,
+   "message":"Mining successful.",
+   "cost":10.257402967578928,
+   "resource1":{
+      "name":"Scrap",
+      "yield":30,
+      "cargo_space":1000
+   },
+   "fuel":989.742597032421
+  }
 - **/upgrade**: Upgrade ship parts.
     - **part_name**: The part to upgrade. (Fuel Tank, Plasma Injector, Scanner, Warp Drive, Cargo Hold)
-
+  ```json
+  {
+   "success":true,
+   "message":"Part successfully upgraded",
+   "resources":[
+      969.742597032421,
+      200,
+      1200,
+      1000,
+      200
+   ]
+  }
 # Environment Variables
 
 - **GRID_SIZE**: The size of the grid. (Default: 30)

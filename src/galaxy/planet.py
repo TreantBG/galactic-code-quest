@@ -60,6 +60,7 @@ class Planet:
             'gravity': self.gravity,
             'atmosphere': self.atmosphere,
             'resources': self.resources,
+            'can_be_mined': self.can_be_mined()
         }
 
         if self.aliens > 0:

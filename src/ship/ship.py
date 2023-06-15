@@ -16,6 +16,7 @@ class Ship:
         self.position = (start_x, start_y)  # start at the origin
         self.cargo_hold.resources = [100, 200, 200, 200, 200]  # start with each resource
 
+        self.total_collected_alians = 0
         self.total_planets_mined = 0
         self.total_systems_scanned = set()
         self.total_distance_travelled = 0
@@ -197,6 +198,11 @@ class Ship:
                         "cargo_space": cargo_space_2 + yield2
                     }
 
+            if planet.aliens > 0:
+                self.total_collected_alians += planet.aliens
+                result["aliens"] = "Aliens ware collected " + planet.aliens
+                print(result["aliens"])
+
             self.total_planets_mined += 1
             print("Mining operation successful.")
             result["fuel"] = self.cargo_hold.resources[0]
@@ -276,28 +282,34 @@ class Ship:
 
 if __name__ == '__main__':
     # Example usage:
-    player = Ship(3,3)
+    player = Ship(3, 3)
     planet = generate_planet("Terrestrial")
 
     planet.set_position((3, 3))
     planet.resources = {
-        "Scrap": 500,
+        "Scrap": 2000,
     }
     # print(planet.to_dict())
     # print("mining cost is", player.calculate_mining_cost(planet))
 
-    print(player.mine(planet))
+    # print(player.mine(planet))
     # Upgrade the Warp Drive:
-    print(player.total_resources_mined)
+    # print(player.total_resources_mined)
     player.cargo_hold.resources = [1000, 970, 1200, 1200, 200]
     # print(player.mine(planet))
     #
-    print(player.travel((-1, 0)))
-    # print(player.mine(planet))
+    # print(player.travel((-1, 0)))
+    print(player.mine(planet))
     # print(planet.resources)
-    print(player.upgrade('Warp Drive'))
-    print(player.upgrade('Warp Drive'))
-    print(player.upgrade('Warp Drive'))
+    print("-----------------------------")
+    print(player.get_parts_info()['Cargo Hold'])
+    print("-----------------------------")
+    print(player.upgrade('Cargo Hold'))
+    print("-----------------------------")
+    print(player.get_parts_info()['Cargo Hold'])
+    print("-----------------------------")
+    # print(player.upgrade('Warp Drive'))
+    # print(player.upgrade('Warp Drive'))
     # print(player.travel((3, 3)))
     # print(player.travel((3, 3)))
     #

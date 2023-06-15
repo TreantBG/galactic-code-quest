@@ -15,7 +15,7 @@ class ShipPart:
             self.value += self.upgrade_value
             # ['Dark Matter', 'Scrap', 'Energy Crystals', 'Rare Earth Elements', 'Plasma']
             cargo_hold.resources = [a - b for a, b in zip(cargo_hold.resources, self.cost)]
-            self.cost = [self.level * cost for cost in self.upgrade_cost]
+            self.cost = [sum(x) for x in zip([cost for cost in self.cost], [cost for cost in self.upgrade_cost])]
             return {
                 "success": True,
                 "message": "Part successfully upgraded",
