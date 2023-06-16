@@ -1,9 +1,10 @@
+import math
 import operator
 import random
 
 import requests as requests
 
-base_url = "http://localhost:5000"
+base_url = "http://localhost:5002"
 
 
 def into():
@@ -183,21 +184,21 @@ def find_lacking_resources(ship_info):
 
 def get_ship_destination_in_direction(direction, ship_info):
     ship_max_travel_distance = ship_info['parts']['Warp Drive']['value']
+    diagonal_distance = ship_max_travel_distance / math.sqrt(2)
 
     # Define the possible moves for each direction
     directions = {
         "N": (0, ship_max_travel_distance),
-        "NE": (ship_max_travel_distance, ship_max_travel_distance),
+        "NE": (diagonal_distance, diagonal_distance),
         "E": (ship_max_travel_distance, 0),
-        "SE": (ship_max_travel_distance, -ship_max_travel_distance),
+        "SE": (diagonal_distance, -diagonal_distance),
         "S": (0, -ship_max_travel_distance),
-        "SW": (-ship_max_travel_distance, -ship_max_travel_distance),
+        "SW": (-diagonal_distance, -diagonal_distance),
         "W": (-ship_max_travel_distance, 0),
-        "NW": (-ship_max_travel_distance, ship_max_travel_distance)
+        "NW": (-diagonal_distance, diagonal_distance)
     }
 
     # Get the current position of the ship
-    ship_info = into()
     current_position = ship_info['position']
 
     # Get the move for the specified direction
@@ -228,9 +229,6 @@ This function returns a list of upgrades that the player can currently afford gi
 get_nearest_mineable_system(scanned_systems, fuel): 
 This function selects the nearest mineable system from a list of scanned systems, considering the system's fuel cost and the number of celestial bodies it contains.
 
-get_best_planet(system, priority_resources, ignore_planets_ids=None): 
-This function selects the best planet for mining within a given system, based on a list of priority resources.
-
 get_best_planets_for_mining(system, priority_resources): 
 This function returns the top two planets for mining within a given system, considering the priority of different resources.
 
@@ -253,6 +251,16 @@ get_random_direction():
 This function randomly selects one direction from eight possible ones: North, North-East, East, South-East, South, South-West, West, and North-West.
 """
 
+
+def game_step():
+    pass
+
+
+def game_loop():
+    while True:
+        game_step()
+
+
 if __name__ == '__main__':
     scan_result = scan()
     info_result = into()
@@ -269,20 +277,27 @@ if __name__ == '__main__':
     # print(scan_current_system(scan_result, ship_position))
 
     random_direction = get_random_direction()  # Possible directions: N, NE, E, SE, S, SW, W, NW
-    # print(get_ship_destination_in_direction(random_direction, info_result))
-
-    lacking_resources = find_lacking_resources(info_result)
-    available_upgrades = get_available_upgrades(info_result)
-    if available_upgrades and len(available_upgrades) > 0:
-        print(upgrade(available_upgrades[0]))
-
-    system_for_mining = get_nearest_mineable_system(scan_result, ship_fuel)
-    if system_for_mining and system_for_mining['position'] != ship_position:
-        print("Travelling to system: " + str(system_for_mining['position']))
-        system_for_mining = travel_and_scan_current_system(system_for_mining['position'])
-
-    planets_for_mining = get_best_planets_for_mining(system_for_mining, lacking_resources)
-    result = mine_best_planets(planets_for_mining)
-    if result:
-        for r in result:
-            print(r)
+    print("random_direction", random_direction)
+    travel_dest = get_ship_destination_in_direction(random_direction, info_result) # (510, 500)
+    print("travel_dest", travel_dest)
+    travel_result = travel(travel_dest)
+    print(travel_result)
+    #
+    # available_upgrades = get_available_upgrades(info_result)  # ["Cargo Hold"]
+    # if available_upgrades and len(available_upgrades) > 0:
+    #     print(upgrade(available_upgrades[0]))
+    #
+    # info_result = into()
+    #
+    # lacking_resources = find_lacking_resources(info_result)
+    #
+    # system_for_mining = get_nearest_mineable_system(scan_result, ship_fuel)
+    # if system_for_mining and system_for_mining['position'] != ship_position:
+    #     print("Travelling to system: " + str(system_for_mining['position']))
+    #     system_for_mining = travel_and_scan_current_system(system_for_mining['position'])
+    #
+    # planets_for_mining = get_best_planets_for_mining(system_for_mining, lacking_resources)
+    # result = mine_best_planets(planets_for_mining)
+    # if result:
+    #     for r in result:
+    #         print(r)
