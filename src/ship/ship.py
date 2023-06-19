@@ -200,7 +200,7 @@ class Ship:
 
             if planet.aliens > 0:
                 self.total_collected_alians += planet.aliens
-                result["aliens"] = "Aliens ware collected " + planet.aliens
+                result["aliens"] = "Aliens ware collected " + str(planet.aliens)
                 print(result["aliens"])
 
             self.total_planets_mined += 1
