@@ -4,7 +4,7 @@ import random
 
 import requests as requests
 
-base_url = "http://localhost:5002"
+base_url = "http://127.0.0.1:5000"
 
 
 def into():
@@ -14,6 +14,11 @@ def into():
 
 def scan():
     response = requests.get(base_url + "/scan")
+    return response.json()
+
+
+def statistics():
+    response = requests.get(base_url + "/statistics")
     return response.json()
 
 
@@ -128,6 +133,9 @@ def mine_best_planets(best_planets):
 
     mine_results = []
     for planet in best_planets:
+        if not planet:
+            continue
+
         resource_1 = None
         resource_2 = None
         if 'resources' in planet:
@@ -265,6 +273,9 @@ if __name__ == '__main__':
     scan_result = scan()
     info_result = into()
 
+    statistics_result = statistics()
+    print(statistics_result)
+    exit(1)
     ship_parts = info_result["parts"]
     ship_position = info_result["position"]
     ship_resources = info_result["resources"]
@@ -278,7 +289,7 @@ if __name__ == '__main__':
 
     random_direction = get_random_direction()  # Possible directions: N, NE, E, SE, S, SW, W, NW
     print("random_direction", random_direction)
-    travel_dest = get_ship_destination_in_direction(random_direction, info_result) # (510, 500)
+    travel_dest = get_ship_destination_in_direction(random_direction, info_result)  # (510, 500)
     print("travel_dest", travel_dest)
     travel_result = travel(travel_dest)
     print(travel_result)

@@ -1,3 +1,4 @@
+import json
 import math
 import os
 
@@ -20,17 +21,18 @@ player = Ship(grid_size / 2, grid_size / 2)
 
 @app.route('/statistics', methods=['GET'])
 def get_player_statistics():
-    return jsonify({
+    result = {
         'ship': {
             'distance_from_start': math.dist((grid_size / 2, grid_size / 2), player.position),
             'position': player.position,
             'total_planets_mined': player.total_planets_mined,
             'total_resources_mined': player.total_resources_mined,
             'total_collected_alians': player.total_collected_alians,
-            'total_systems_scanned': player.total_systems_scanned,
+            'total_systems_scanned': len(list(player.total_systems_scanned)),
             'total_distance_travelled': player.total_distance_travelled,
         }
-    })
+    }
+    return jsonify(result)
 
 
 @app.route('/info', methods=['GET'])

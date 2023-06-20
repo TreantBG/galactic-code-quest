@@ -237,12 +237,14 @@ class Ship:
             if distance >= max_range * 0.75:
                 # Only basic information
                 system_info = {
+                    'can_be_mined': system.can_be_mined(),
                     'star_type': system.star_type,
                     'num_celestial_bodies': len(system.planets),
                 }
             elif distance >= max_range * 0.5:
                 # Additional details available
                 system_info = {
+                    'can_be_mined': system.can_be_mined(),
                     'star_type': system.star_type,
                     'num_celestial_bodies': len(system.planets),
                     'celestial_bodies': [
