@@ -4,6 +4,8 @@ import random
 
 import requests
 
+from test import get_next_spiral_checkpoint
+
 base_url = "http://localhost:5001"
 
 
@@ -204,7 +206,7 @@ ship_max_scan_distance = ship_parts["Scanner"]["value"]
 
 
 def get_ship_destination_in_direction(direction, ship_info):
-    ship_max_travel_distance = ship_info['parts']['Warp Drive']['value'] - 0.4
+    ship_max_travel_distance = ship_info['parts']['Warp Drive']['value'] - 1
     diagonal_distance = ship_max_travel_distance / math.sqrt(2)
 
     # Define the possible moves for each direction
@@ -243,10 +245,19 @@ def get_random_direction():
     return random.choice(directions)
 
 
+def get_distance_between_points(p1, p2):
+    # Calculate the vector towards the target destination
+    dx, dy = p1[0] - p2[0], p1[1] - p2[1]
+
+    # Calculate the distance to the target destination
+    distance = math.sqrt(dx ** 2 + dy ** 2)
+    return distance
+
+
 def get_ship_destination(target_destination, ship_info):
     # Get the current position and maximum travel distance of the ship
     current_position = ship_info['position']
-    ship_max_travel_distance = ship_info['parts']['Warp Drive']['value'] - 0.4
+    ship_max_travel_distance = ship_info['parts']['Warp Drive']['value'] - 1
 
     # Calculate the vector towards the target destination
     dx, dy = target_destination[0] - current_position[0], target_destination[1] - current_position[1]
@@ -310,15 +321,6 @@ def find_next_upgrade(ship_data, strategy):
 
 
 def game_step():
-    pass
-
-
-def game_loop():
-    while True:
-        game_step()
-
-
-if __name__ == '__main__':
     scan_result = scan()
     info_result = info()
     # statistics_result = statistics()
@@ -331,44 +333,61 @@ if __name__ == '__main__':
     ship_max_travel_distance = ship_parts["Warp Drive"]["value"]
     ship_max_scan_distance = ship_parts["Scanner"]["value"]
 
-    next_dest = get_ship_destination((300, 300), ship_info=info_result)
-    print(next_dest)
+    strategy = [
+        {'Cargo Hold': 2},
+        {'Fuel Tank': 2},
+        {'Scanner': 2},
+    ]
 
-    travel_result = travel(next_dest)
-    print(travel_result)
-    # print(ship_position, ship_fuel)
-    #
-    # strategy = [
-    #     {'Cargo Hold': 2},
-    #     {'Fuel Tank': 3},
-    #     {'Plasma Injector': 2}
-    # ]
-    # print(find_next_upgrade(info_result, strategy))
-    exit(1)
     # print(scan_current_system(scan_result, ship_position))
 
-    random_direction = get_random_direction()  # Possible directions: N, NE, E, SE, S, SW, W, NW
-    print("random_direction", random_direction)
-    travel_dest = get_ship_destination_in_direction(random_direction, info_result)  # (510, 500)
-    print("travel_dest", travel_dest)
-    travel_result = travel(travel_dest)
-    print(travel_result)
-    #
-    # available_upgrades = get_available_upgrades(info_result)  # ["Cargo Hold"]
-    # if available_upgrades and len(available_upgrades) > 0:
-    #     print(upgrade(available_upgrades[0]))
-    #
-    # info_result = into()
-    #
-    # lacking_resources = find_lacking_resources(info_result)
-    #
-    # system_for_mining = get_nearest_mineable_system(scan_result, ship_fuel)
-    # if system_for_mining and system_for_mining['position'] != ship_position:
-    #     print("Travelling to system: " + str(system_for_mining['position']))
-    #     system_for_mining = travel_and_scan_current_system(system_for_mining['position'])
-    #
-    # planets_for_mining = get_best_planets_for_mining(system_for_mining, lacking_resources)
-    # result = mine_best_planets(planets_for_mining)
-    # if result:
-    #     for r in result:
-    #         print(r)
+    available_upgrades = get_available_upgrades(info_result)  # ["Cargo Hold"]
+    if available_upgrades and len(available_upgrades) > 0 and ship_fuel < 60:
+        next_upgrade = find_next_upgrade(info_result, strategy)
+        if next_upgrade:
+            print(upgrade(next_upgrade))
+        else:
+            print(upgrade(available_upgrades[0]))
+        info_result = info()
+
+    lacking_resources = find_lacking_resources(info_result)
+    system_for_mining = get_nearest_mineable_system(scan_result, ship_fuel)
+    if system_for_mining and system_for_mining['position'] != ship_position:
+        # print("Travelling to system: " + str(system_for_mining['position']))
+        system_for_mining = travel_and_scan_current_system(system_for_mining['position'])
+
+    planets_for_mining = get_best_planets_for_mining(system_for_mining, lacking_resources)
+    result = mine_best_planets(planets_for_mining)
+    if not result:
+        follow_path()
+
+
+
+def game_loop():
+    while True:
+        game_step()
+
+
+next_direction = get_next_spiral_checkpoint()
+
+
+def follow_path():
+    global next_direction
+    allowed_distance = 5
+    disntace_achieved = 0  # just a big number to start
+
+    while disntace_achieved < allowed_distance:
+        next_direction = get_next_spiral_checkpoint()
+        disntace_achieved = get_distance_between_points(next_direction, info_result["position"])
+
+    next_dest = get_ship_destination(next_direction, ship_info=info_result)
+    travel_result = travel(next_dest)
+    print(travel_result, next_dest)
+    if travel_result["success"]:
+        disntace_achieved = get_distance_between_points(next_dest, travel_result["position"])
+        if disntace_achieved < allowed_distance:
+            next_direction = get_next_spiral_checkpoint()
+
+
+if __name__ == '__main__':
+    game_loop()
