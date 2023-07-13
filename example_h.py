@@ -2,7 +2,7 @@ import math
 import operator
 import random
 
-import requests
+import requests as requests
 
 base_url = "http://localhost:5001"
 
@@ -16,7 +16,6 @@ def scan():
     response = requests.get(base_url + "/scan")
     return response.json()
 
-
 def travel(position):
     response = requests.post(base_url + "/travel", json={"x": position[0], "y": position[1]})
     return response.json()
@@ -25,13 +24,12 @@ def travel(position):
 def mine(planet_id, resource1=None, resource2=None):
     response = requests.post(base_url + "/mine",
                              json={"planet_id": planet_id, "resource1": resource1, "resource2": resource2})
+    # print(response)
     return response.json()
-
 
 def statistics():
     response = requests.get(base_url + "/statistics")
     return response.json()
-
 
 def upgrade(part_name):
     response = requests.post(base_url + "/upgrade", json={"part_name": part_name})
@@ -117,10 +115,12 @@ def get_best_planets_for_mining(system, priority_resources):
     if not system or not priority_resources:
         return None
 
+    
     first_planet = get_best_planet(system, priority_resources)
-    # print(first_planet)
+    print(first_planet)
     if not first_planet:
         return None
+    
 
     priority_resources = [resource for resource in priority_resources if resource not in first_planet['resources']]
     second_planet = get_best_planet(system, priority_resources, ignore_planets_ids=[first_planet['id']])
@@ -141,8 +141,7 @@ def mine_best_planets(best_planets):
                 resource_1 = planet['resources'][0] if len(planet['resources']) > 0 else None
                 resource_2 = planet['resources'][1] if len(planet['resources']) > 1 else None
 
-            # print("Mining planet: " + str(planet['id']) + " with resources: " + str(resource_1) + " and " + str(
-            #     resource_2))
+            print("Mining planet: " + str(planet['id']) + " with resources: " + str(resource_1) + " and " + str(resource_2))
             mine_results.append(mine(planet['id'], resource_1, resource_2))
 
     return mine_results
@@ -202,9 +201,8 @@ ship_max_scan_distance = ship_parts["Scanner"]["value"]
 ship_max_travel_distance = ship_parts["Warp Drive"]["value"]
 ship_max_scan_distance = ship_parts["Scanner"]["value"]
 
-
 def get_ship_destination_in_direction(direction, ship_info):
-    ship_max_travel_distance = ship_info['parts']['Warp Drive']['value'] - 0.4
+    ship_max_travel_distance = ship_info['parts']['Warp Drive']['value'] -1
     diagonal_distance = ship_max_travel_distance / math.sqrt(2)
 
     # Define the possible moves for each direction
@@ -243,31 +241,6 @@ def get_random_direction():
     return random.choice(directions)
 
 
-def get_ship_destination(target_destination, ship_info):
-    # Get the current position and maximum travel distance of the ship
-    current_position = ship_info['position']
-    ship_max_travel_distance = ship_info['parts']['Warp Drive']['value'] - 0.4
-
-    # Calculate the vector towards the target destination
-    dx, dy = target_destination[0] - current_position[0], target_destination[1] - current_position[1]
-
-    # Calculate the distance to the target destination
-    distance_to_target = math.sqrt(dx ** 2 + dy ** 2)
-
-    if distance_to_target <= ship_max_travel_distance:
-        # The target destination is within reach
-        return target_destination
-    else:
-        # The target destination is too far. Calculate a new destination within reach.
-        # Maintain the direction towards the target by normalizing the vector
-        dx, dy = dx / distance_to_target, dy / distance_to_target
-        # Multiply by the maximum travel distance to get the new destination
-        new_position = (
-            math.floor(current_position[0] + dx * ship_max_travel_distance),
-            math.floor(current_position[1] + dy * ship_max_travel_distance))
-        return new_position
-
-
 """
 get_available_upgrades(info_response): 
 This function returns a list of upgrades that the player can currently afford given the current resources.
@@ -297,78 +270,51 @@ get_random_direction():
 This function randomly selects one direction from eight possible ones: North, North-East, East, South-East, South, South-West, West, and North-West.
 """
 
-
-def find_next_upgrade(ship_data, strategy):
-    for part in strategy:
-        part_name = list(part.keys())[0]  # Get the part name
-        target_level = part[part_name]  # Get the target level
-
-        # Check if the part's current level is less than the target level
-        if ship_data['parts'][part_name]['level'] < target_level:
-            return part_name  # Return the part to be upgraded next
-    return None  # If all parts are at target levels, return None
+#############################
 
 
 def game_step():
-    pass
-
-
-def game_loop():
-    while True:
-        game_step()
-
-
-if __name__ == '__main__':
+    # Step 1: Get current game information
     scan_result = scan()
     info_result = info()
-    # statistics_result = statistics()
-    # print(statistics_result)
+    get_statistics = statistics()
 
-    ship_parts = info_result["parts"]
+    # ship_parts = info_result["parts"]
     ship_position = info_result["position"]
     ship_resources = info_result["resources"]
     ship_fuel = ship_resources["Dark Matter"]
-    ship_max_travel_distance = ship_parts["Warp Drive"]["value"]
-    ship_max_scan_distance = ship_parts["Scanner"]["value"]
 
-    next_dest = get_ship_destination((300, 300), ship_info=info_result)
-    print(next_dest)
+    ######### Travel
 
-    travel_result = travel(next_dest)
-    print(travel_result)
-    # print(ship_position, ship_fuel)
-    #
-    # strategy = [
-    #     {'Cargo Hold': 2},
-    #     {'Fuel Tank': 3},
-    #     {'Plasma Injector': 2}
-    # ]
-    # print(find_next_upgrade(info_result, strategy))
-    exit(1)
-    # print(scan_current_system(scan_result, ship_position))
+    
+    available_upgrades = get_available_upgrades(info_result)
+    if available_upgrades and len(available_upgrades) > 0:
+        upgrade("Fuel Tank")
+        upgrade("Plasma Injector")
+        upgrade(available_upgrades[0])
+    lacking_resources = find_lacking_resources(info_result)    
+    system_for_mining = get_nearest_mineable_system(scan_result, ship_fuel)
+    if system_for_mining and system_for_mining['position'] != ship_position:
+        system_for_mining = travel_and_scan_current_system(system_for_mining['position'])
+        best_planets = get_best_planets_for_mining(system_for_mining, lacking_resources)
+        mine_best_planets(best_planets)
+    else:
+        random_direction = get_random_direction()  # Possible directions: N, NE, E, SE, S, SW, W, NW
+        # print("random_direction", random_direction)
+        travel_dest = get_ship_destination_in_direction(random_direction, info_result) # (510, 500)
+        response = travel(travel_dest)
+        if 'message' in response and response['message'] == 'Not enough fuel.': # Stop the game where there is not enough fuel
+            print("Game over: Not enough fuel.")
+            print("Statistics:", get_statistics)
+            return False
+    return True         
 
-    random_direction = get_random_direction()  # Possible directions: N, NE, E, SE, S, SW, W, NW
-    print("random_direction", random_direction)
-    travel_dest = get_ship_destination_in_direction(random_direction, info_result)  # (510, 500)
-    print("travel_dest", travel_dest)
-    travel_result = travel(travel_dest)
-    print(travel_result)
-    #
-    # available_upgrades = get_available_upgrades(info_result)  # ["Cargo Hold"]
-    # if available_upgrades and len(available_upgrades) > 0:
-    #     print(upgrade(available_upgrades[0]))
-    #
-    # info_result = into()
-    #
-    # lacking_resources = find_lacking_resources(info_result)
-    #
-    # system_for_mining = get_nearest_mineable_system(scan_result, ship_fuel)
-    # if system_for_mining and system_for_mining['position'] != ship_position:
-    #     print("Travelling to system: " + str(system_for_mining['position']))
-    #     system_for_mining = travel_and_scan_current_system(system_for_mining['position'])
-    #
-    # planets_for_mining = get_best_planets_for_mining(system_for_mining, lacking_resources)
-    # result = mine_best_planets(planets_for_mining)
-    # if result:
-    #     for r in result:
-    #         print(r)
+def game_loop():
+    while True:
+        if not game_step():
+            break
+
+if __name__ == '__main__':
+    game_loop()
+
+##############################

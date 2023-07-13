@@ -4,6 +4,6 @@ services:
     build: .
     image: treantbg/galactic-code-quest
     ports:
-      - 5000:5000
+      - 5001:5000
     environment:
       - GRID_SIZE=1000
